@@ -28,19 +28,29 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
-    private Button b, choose, camera, showPdf,send;
-    ImageView imageView;
+    private Button b, choose, camera, showPdf,send,rotate;
+    ImageView imageView,newImage;
     Bitmap bitmap;
     private String imgPath;
     File destination;
     EditText eemail;
     String email;
+    Bitmap bmpp;
 
+
+
+
+
+    Bitmap imageScaled, imageOriginal;
+    private int dialerHeight, dialerWidth;
+    Matrix matrix;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +64,16 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent, 2);
             }
         });
+
+        newImage= (ImageView) findViewById(R.id.image);
+        rotate= (Button) findViewById(R.id.rotate);
+        rotate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rotateImage();
+            }
+        });
+
 
         choose = (Button) findViewById(R.id.choose);
         choose.setOnClickListener(new View.OnClickListener() {
@@ -134,6 +154,8 @@ public class MainActivity extends Activity {
 
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 
+            // rotateImage();
+
         } else if (requestCode == 2) {
 
             String[] projection = {MediaStore.Images.Media.DATA};
@@ -148,10 +170,78 @@ public class MainActivity extends Activity {
             Bitmap im = BitmapFactory.decodeFile(imagePath);
 
             imageView.setImageBitmap(im);
+            // rotateImage();
+
+        } else if (requestCode == 3) {
+            newImage= (ImageView) findViewById(R.id.imageview);
+           // imageView.setVisibility(View.GONE);
 
 
+            //byte[] byteArray = data.getByteArrayExtra("picture");
+            if (imageOriginal == null) {
+                imageOriginal = data.getParcelableExtra("picture");
+                imageView.setImageBitmap(imageOriginal);
+            }
+            if(imageOriginal!=null) {
+                //imageView.setImageBitmap(imageOriginal);
+                //newImage.setVisibility(View.VISIBLE);
+            }
+         /*   matrix = new Matrix();
 
+         *//*   newImage.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {*//*
+                    // method called more than once, but the values only need to be initialized one time
+                    if (dialerHeight == 0 || dialerWidth == 0) {
+                        dialerHeight = newImage.getHeight();
+                        dialerWidth = newImage.getWidth();
+
+                        // resize
+                        Matrix resize = new Matrix();
+                        //resize.postScale(500/ (float) imageOriginal.getWidth(),(float) Math.max(dialerWidth, dialerHeight) / (float) imageOriginal.getHeight());
+                        resize.postScale((float) Math.min(dialerWidth, dialerHeight) / (float) imageOriginal.getWidth(), (float) Math.min(dialerWidth, dialerHeight) / (float) imageOriginal.getHeight());
+                        //resize.postScale(300, 300);
+                        imageScaled = Bitmap.createBitmap(imageOriginal, 0, 0, imageOriginal.getWidth(), imageOriginal.getHeight(), resize, false);
+                        // translate to the image view's center
+                        float translateX = dialerWidth / 2 - imageScaled.getWidth() / 2;
+                        float translateY = dialerHeight / 2 - imageScaled.getHeight() / 2;
+                        matrix.postTranslate(translateX, translateY);
+                        newImage.setImageBitmap(imageScaled);
+                        newImage.setImageMatrix(matrix);
+                        newImage.setVisibility(View.VISIBLE);
+
+                    }
+                }*/
+            //    });
+            // showImage();
         }
+
+    }
+
+
+    public void showImage()
+    {
+
+
+    }
+
+    public void rotateImage(){
+         if(bmpp==null)
+         {
+             Toast.makeText(getApplicationContext(),"pagol",Toast.LENGTH_LONG).show();
+         }
+        else {
+             Toast.makeText(getApplicationContext(),"pachhe",Toast.LENGTH_LONG).show();
+             ByteArrayOutputStream stream = new ByteArrayOutputStream();
+             Bitmap bb=Bitmap.createScaledBitmap(bmpp,120,120,false);
+             bb.compress(Bitmap.CompressFormat.PNG, 100, stream);
+             byte[] byteArray = stream.toByteArray();
+
+
+             Intent intent = new Intent(MainActivity.this, RotateImage.class);
+             intent.putExtra("picture", bb);
+             startActivityForResult(intent,3);
+         }
     }
 
     public void createPDF() {
@@ -175,7 +265,9 @@ public class MainActivity extends Activity {
             doc.open();
 
             BitmapDrawable image = (BitmapDrawable) imageView.getDrawable();
+
             Bitmap bmp = image.getBitmap();
+             bmpp = image.getBitmap();
             int width = image.getMinimumWidth();
             Log.e("actual width", String.valueOf(width));
             if (width > 500) {
