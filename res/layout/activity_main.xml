@@ -16,10 +16,25 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         tools:context=".MainActivity">
 
+
+
+
+            <ImageView
+                android:id="@+id/img"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+
+                />
+
         <ImageView
-            android:id="@+id/img"
+            android:id="@+id/imageview"
             android:layout_width="match_parent"
-            android:layout_height="300dp" />
+            android:layout_height="300dp"
+            android:scaleType="matrix"
+            android:visibility="gone"/>
+
+
+
 
         <Button
             android:id="@+id/choose"
@@ -65,6 +80,13 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/show"
             android:text="Send"
+            />
+        <Button
+            android:id="@+id/rotate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/send"
+            android:text="rotate"
             />
 
     </RelativeLayout>
