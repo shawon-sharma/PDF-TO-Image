@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import com.example.utils.ExifUtil;
+import com.example.utils.PicSave;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
@@ -45,7 +46,9 @@ public class MainActivity extends Activity {
     String email;
     Bitmap bmpp;
 
-
+    int bWidth;
+    int bHeight;
+    String path;
 
 
 
@@ -154,10 +157,9 @@ public class MainActivity extends Activity {
 
 
             Bitmap im = BitmapFactory.decodeFile(picturePath);
-
+            path=picturePath;
+            Log.e("image path",path);
             Bitmap orientedBitmap= ExifUtil.rotateBitmap(picturePath,im);
-
-
             imageView.setImageBitmap(orientedBitmap);
 
             // rotateImage();
@@ -175,25 +177,30 @@ public class MainActivity extends Activity {
             String imagePath = cursor.getString(column_index_data);
             Bitmap im = BitmapFactory.decodeFile(imagePath);
 
-
+            path=imagePath;
+           Log.e("image path",path);
             Bitmap orientedBitmap= ExifUtil.rotateBitmap(imagePath,im);
+
             imageView.setImageBitmap(orientedBitmap);
             // rotateImage();
 
         } else if (requestCode == 3) {
             newImage= (ImageView) findViewById(R.id.imageview);
            // imageView.setVisibility(View.GONE);
-
+           path=PicSave.getCacheFilename();
 
             //byte[] byteArray = data.getByteArrayExtra("picture");
             if (imageOriginal == null) {
                 imageOriginal = data.getParcelableExtra("picture");
-                imageView.setImageBitmap(imageOriginal);
+               // imageView.setImageBitmap(imageOriginal);
+                imageView.setImageBitmap(PicSave.loadFromCacheFile());
+
             }
             if(imageOriginal!=null) {
                 imageOriginal = data.getParcelableExtra("picture");
-                imageView.setImageBitmap(imageOriginal);
-                //newImage.setVisibility(View.VISIBLE);
+                //imageView.setImageBitmap(imageOriginal);
+                imageView.setImageBitmap(PicSave.loadFromCacheFile());
+
             }
          /*   matrix = new Matrix();
 
@@ -240,11 +247,12 @@ public class MainActivity extends Activity {
              BitmapDrawable image = (BitmapDrawable) imageView.getDrawable();
              bmpp = image.getBitmap();
              ByteArrayOutputStream stream = new ByteArrayOutputStream();
-             Bitmap bb=Bitmap.createScaledBitmap(bmpp,120,120,false);
+             Bitmap bb=Bitmap.createScaledBitmap(bmpp,300,300,false);
              bb.compress(Bitmap.CompressFormat.PNG, 100, stream);
              byte[] byteArray = stream.toByteArray();
              Intent intent = new Intent(MainActivity.this, RotateImage.class);
              intent.putExtra("picture", bb);
+             intent.putExtra("path",path);
              startActivityForResult(intent,3);
     }
 

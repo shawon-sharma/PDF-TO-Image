@@ -16,16 +16,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.utils.*;
 
-import com.squareup.picasso.Picasso;
+import com.example.utils.ExifUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 public class RotateImage extends Activity {
 
-Button save;
-    ImageView image,checkImage;
+    Button save;
+    ImageView image, checkImage;
     Button btnRotate;
     TextView coordinate;
     Bitmap bMap;
@@ -35,34 +36,43 @@ Button save;
     private int dialerHeight, dialerWidth;
     private double startAngle;
     private static Bitmap imageOriginal, imageScaled, lastone;
+    private File path;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rotate_image);
         image = (ImageView) findViewById(R.id.image);
-        checkImage= (ImageView) findViewById(R.id.kk);
-        save= (Button) findViewById(R.id.save);
+
+        save = (Button) findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                Bitmap bb=Bitmap.createScaledBitmap(lastone,120,120,false);
+                PicSave.saveToCacheFile(lastone);
+                Bitmap bb = Bitmap.createScaledBitmap(lastone, 120, 120, false);
                 bb.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
                 Intent intent = new Intent();
                 intent.putExtra("picture", bb);
 
-                setResult(3,intent);
+                setResult(3, intent);
+
+
 
                 finish();
 
             }
         });
         Intent intent = getIntent();
-        Bitmap bitmap = (Bitmap) intent.getParcelableExtra("picture");
-        checkImage.setImageBitmap(bitmap);
-        imageOriginal =bitmap;
+        String imagePath = intent.getExtras().getString("path");
+        Bitmap im = BitmapFactory.decodeFile(imagePath);
+        Bitmap orientedBitmap = ExifUtil.rotateBitmap(imagePath, im);
 
+        //Bitmap bitmap = (Bitmap) intent.getParcelableExtra("picture");
+
+        //imageOriginal =bitmap;
+        imageOriginal = orientedBitmap;
         matrix = new Matrix();
         image.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -71,7 +81,6 @@ Button save;
                 if (dialerHeight == 0 || dialerWidth == 0) {
                     dialerHeight = image.getHeight();
                     dialerWidth = image.getWidth();
-
                     // resize
                     Matrix resize = new Matrix();
                     //resize.postScale(500/ (float) imageOriginal.getWidth(),(float) Math.max(dialerWidth, dialerHeight) / (float) imageOriginal.getHeight());
@@ -119,24 +128,25 @@ Button save;
             }
         });
     }
- /*   public void rotate(float x_axis, float y_axis) {
-        image.buildDrawingCache();
-        bMap = image.getDrawingCache();
 
-        coordinate.setText("x+ y " + x_axis + "  " + a);
-        if (a > x_axis)
+    /*   public void rotate(float x_axis, float y_axis) {
+           image.buildDrawingCache();
+           bMap = image.getDrawingCache();
 
-            matrix.preRotate(-1);
-        else if (a == x_axis) {
-        } else
-            matrix.preRotate(1);
-        Bitmap bMapRotate = Bitmap.createBitmap(bMap, 0, 0, bMap.getWidth(), bMap.getHeight(), matrix, true);
-        //put rotated image in ImageView.
-        image.setImageBitmap(bMapRotate);
+           coordinate.setText("x+ y " + x_axis + "  " + a);
+           if (a > x_axis)
+
+               matrix.preRotate(-1);
+           else if (a == x_axis) {
+           } else
+               matrix.preRotate(1);
+           Bitmap bMapRotate = Bitmap.createBitmap(bMap, 0, 0, bMap.getWidth(), bMap.getHeight(), matrix, true);
+           //put rotated image in ImageView.
+           image.setImageBitmap(bMapRotate);
 
 
-    }
-*/
+       }
+   */
     public void drag(float x_axis, float y_axis) {
         float dx = x_axis - a;
         float dy = y_axis - b;
@@ -148,9 +158,9 @@ Button save;
         //matrix.postRotate(degrees);
         //image.setImageBitmap(Bitmap.createBitmap(imageScaled, 0, 0, imageScaled.getWidth(), imageScaled.getHeight(), matrix, true));
         matrix.postRotate(degrees, dialerWidth / 2, dialerHeight / 2);
-        Matrix ll=matrix;
+        Matrix ll = matrix;
         image.setImageMatrix(matrix);
-        lastone = Bitmap.createBitmap(imageScaled, 0, 0, imageScaled.getWidth(), imageScaled.getHeight(),ll, true);
+        lastone = Bitmap.createBitmap(imageScaled, 0, 0, imageScaled.getWidth(), imageScaled.getHeight(), ll, true);
         Canvas canvas = new Canvas(lastone);
         canvas.drawColor(0xfff);
     }
@@ -172,6 +182,7 @@ Button save;
                 return 0;
         }
     }
+
     private static int getQuadrant(double x, double y) {
         if (x >= 0) {
             return y >= 0 ? 1 : 4;
