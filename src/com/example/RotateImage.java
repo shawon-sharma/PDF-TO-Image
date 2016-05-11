@@ -1,6 +1,7 @@
 package com.example;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,12 +17,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 public class RotateImage extends Activity {
 
 Button save;
-    ImageView image;
+    ImageView image,checkImage;
     Button btnRotate;
     TextView coordinate;
     Bitmap bMap;
@@ -36,7 +40,7 @@ Button save;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rotate_image);
         image = (ImageView) findViewById(R.id.image);
-
+        checkImage= (ImageView) findViewById(R.id.kk);
         save= (Button) findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,16 +53,16 @@ Button save;
                 intent.putExtra("picture", bb);
 
                 setResult(3,intent);
-                image.setImageDrawable(null);
+
                 finish();
+
             }
         });
         Intent intent = getIntent();
         Bitmap bitmap = (Bitmap) intent.getParcelableExtra("picture");
-     /*  = extras.get.getByteArray("picture");*/
-        if (imageOriginal == null) {
-            imageOriginal =bitmap;
-        }
+        checkImage.setImageBitmap(bitmap);
+        imageOriginal =bitmap;
+
         matrix = new Matrix();
         image.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -79,6 +83,7 @@ Button save;
                     matrix.postTranslate(translateX, translateY);
                     image.setImageBitmap(imageScaled);
                     image.setImageMatrix(matrix);
+
 
                 }
             }
@@ -114,7 +119,7 @@ Button save;
             }
         });
     }
-    public void rotate(float x_axis, float y_axis) {
+ /*   public void rotate(float x_axis, float y_axis) {
         image.buildDrawingCache();
         bMap = image.getDrawingCache();
 
@@ -131,7 +136,7 @@ Button save;
 
 
     }
-
+*/
     public void drag(float x_axis, float y_axis) {
         float dx = x_axis - a;
         float dy = y_axis - b;
@@ -174,4 +179,6 @@ Button save;
             return y >= 0 ? 2 : 3;
         }
     }
+
+
 }

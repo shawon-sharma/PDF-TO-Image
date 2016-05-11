@@ -191,7 +191,8 @@ public class MainActivity extends Activity {
                 imageView.setImageBitmap(imageOriginal);
             }
             if(imageOriginal!=null) {
-                //imageView.setImageBitmap(imageOriginal);
+                imageOriginal = data.getParcelableExtra("picture");
+                imageView.setImageBitmap(imageOriginal);
                 //newImage.setVisibility(View.VISIBLE);
             }
          /*   matrix = new Matrix();
@@ -234,22 +235,17 @@ public class MainActivity extends Activity {
     }
 
     public void rotateImage(){
-         if(bmpp==null)
-         {
-             Toast.makeText(getApplicationContext(),"pagol",Toast.LENGTH_LONG).show();
-         }
-        else {
+
              Toast.makeText(getApplicationContext(),"pachhe",Toast.LENGTH_LONG).show();
+             BitmapDrawable image = (BitmapDrawable) imageView.getDrawable();
+             bmpp = image.getBitmap();
              ByteArrayOutputStream stream = new ByteArrayOutputStream();
              Bitmap bb=Bitmap.createScaledBitmap(bmpp,120,120,false);
              bb.compress(Bitmap.CompressFormat.PNG, 100, stream);
              byte[] byteArray = stream.toByteArray();
-
-
              Intent intent = new Intent(MainActivity.this, RotateImage.class);
              intent.putExtra("picture", bb);
              startActivityForResult(intent,3);
-         }
     }
 
     public void createPDF() {
