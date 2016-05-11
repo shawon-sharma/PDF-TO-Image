@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import com.example.utils.ExifUtil;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
@@ -152,7 +153,12 @@ public class MainActivity extends Activity {
             cursor.close();
 
 
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            Bitmap im = BitmapFactory.decodeFile(picturePath);
+
+            Bitmap orientedBitmap= ExifUtil.rotateBitmap(picturePath,im);
+
+
+            imageView.setImageBitmap(orientedBitmap);
 
             // rotateImage();
 
@@ -169,7 +175,9 @@ public class MainActivity extends Activity {
             String imagePath = cursor.getString(column_index_data);
             Bitmap im = BitmapFactory.decodeFile(imagePath);
 
-            imageView.setImageBitmap(im);
+
+            Bitmap orientedBitmap= ExifUtil.rotateBitmap(imagePath,im);
+            imageView.setImageBitmap(orientedBitmap);
             // rotateImage();
 
         } else if (requestCode == 3) {
