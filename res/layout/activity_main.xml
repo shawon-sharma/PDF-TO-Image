@@ -16,9 +16,6 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         tools:context=".MainActivity">
 
-
-
-
             <ImageView
                 android:id="@+id/img"
                 android:layout_width="match_parent"
@@ -32,9 +29,6 @@
             android:layout_height="300dp"
             android:scaleType="matrix"
             android:visibility="gone"/>
-
-
-
 
         <Button
             android:id="@+id/choose"
